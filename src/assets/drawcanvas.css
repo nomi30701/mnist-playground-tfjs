@@ -1,0 +1,9 @@
+#draw-canvas {
+    border: 1px solid black;
+    background-color: rgb(243, 243, 243);
+    margin: 0 auto;
+    display: block;
+}
+#drawCanvas-container p{
+    margin: 10px 0;
+}

@@ -1,0 +1,11 @@
+body p {
+    font-size: 1.3em;
+    margin: 0;
+    margin-top: 1em;
+}
+#canvas-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10em;
+}

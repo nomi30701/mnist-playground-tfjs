@@ -1,0 +1,51 @@
+.button {
+    border: none;
+    padding: 7px 10px;
+    margin: 0px 5px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    width: 150px;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+}
+#train-btn {
+    background-color: hsl(122, 39%, 49%);
+}
+#train-btn:hover {
+    background-color: hsl(122, 39%, 39%);
+}
+#train-btn:disabled {
+    background-color: hsl(122, 39%, 69%);
+    cursor: not-allowed;
+}
+#evaluate-btn {
+    background-color: hsl(122, 39%, 49%);
+}
+#evaluate-btn:hover {
+    background-color: hsl(122, 39%, 39%);
+}
+#evaluate-btn:disabled {
+    background-color: hsl(122, 39%, 69%);
+    cursor: not-allowed;
+}
+#togglePanel-btn {
+    background-color: hsl(0, 100%, 69%);
+}
+#togglePanel-btn:hover {
+    background-color: hsl(0, 100%, 59%);
+}
+#toggleBoard-btn {
+    background-color: hsl(224, 100%, 66%);
+}
+#toggleBoard-btn:hover {
+    background-color: hsl(224, 100%, 56%);
+}
+#cleanBoard-btn {
+    background-color: hsl(224, 100%, 66%);
+}
+#cleanBoard-btn:hover {
+    background-color: hsl(224, 100%, 56%);
+}
