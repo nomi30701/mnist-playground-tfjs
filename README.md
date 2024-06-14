@@ -6,4 +6,4 @@ This is mnist dataset playground, In [gh-pages](https://nomi30701.github.io/mnis
 And can handwrite in the canvas,it will predict number.
 
 ## Preview gh-pages
-<img src="https://github.com/nomi30701/mnist-playground-tfjs/blob/main/preview_img.jpg" height=70% width=70% />
+<img src="https://github.com/nomi30701/mnist-playground-tfjs/blob/main/preview_img.jpg"/>
