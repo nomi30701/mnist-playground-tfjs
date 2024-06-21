@@ -8,7 +8,7 @@ function HyperparmSettingComponent() {
       </div>
       <div>
         <label htmlFor='epochs'>Epochs: </label>
-        <input type='number' id='epochs' defaultValue='20' />
+        <input type='number' id='epochs' defaultValue='15' />
       </div>
       <div>
         <label htmlFor='learning-rate'>Learning rate: </label>

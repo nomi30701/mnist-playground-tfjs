@@ -14,7 +14,7 @@ window.onload = function() {
         data: {
             labels: [],
             datasets: [{
-                label: 'Batch Loss',
+                label: 'Loss',
                 data: [],
                 borderColor: 'rgba(75, 192, 192, 1)',
                 fill: false
@@ -52,7 +52,7 @@ window.onload = function() {
         data: {
             labels: [],
             datasets: [{
-                label: 'Batch Accuracy',
+                label: 'Accuracy',
                 data: [],
                 borderColor: 'rgba(255, 99, 132, 1)',
                 fill: false
@@ -91,12 +91,12 @@ window.onload = function() {
         data: {
             labels: [],
             datasets: [{
-                label: 'Epoch Loss',
+                label: 'Loss',
                 data: [],
                 borderColor: 'rgba(75, 192, 192, 1)',
                 fill: false
             }, {
-                label: 'Epoch Validation Loss',
+                label: 'Valid Loss',
                 data: [],
                 borderColor: 'rgba(255, 99, 132, 1)',
                 fill: false
@@ -135,12 +135,12 @@ window.onload = function() {
         data: {
             labels: [],
             datasets: [{
-                label: 'Epoch Accuracy',
+                label: 'Accuracy',
                 data: [],
                 borderColor: 'rgba(75, 192, 192, 1)',
                 fill: false
             }, {
-                label: 'Epoch Validation Accuracy',
+                label: 'Valid Accuracy',
                 data: [],
                 borderColor: 'rgba(255, 99, 132, 1)',
                 fill: false

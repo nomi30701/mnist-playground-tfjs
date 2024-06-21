@@ -22,12 +22,6 @@ function App() {
       <LossInfoComponent />
       <HyperparmSettingComponent />
       <ButtonComponent toggleDrawCanvas={toggleDrawCanvas} isBoardOpen={isDrawCanvasVisible}/>
-      <p style={{ fontSize: '15px' }}>
-        Reference from: 
-        <a href="https://www.tensorflow.org/js/tutorials/transfer/image_classification" target="_blank" rel="noopener noreferrer">
-        https://www.tensorflow.org/js/tutorials/transfer/image_classification
-        </a>
-      </p>
     </>
   )
 }

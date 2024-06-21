@@ -2,8 +2,19 @@ import {MnistData} from './data.js';
 import * as tf from '@tensorflow/tfjs';
 import * as tfvis from '@tensorflow/tfjs-vis';
 import * as charts from './trainChart.js';
-import { Chart, LineController, LineElement, PointElement, LinearScale, CategoryScale, Tooltip } from 'chart.js';
-Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, Tooltip);
+import { 
+    Chart, 
+    LineController, 
+    LineElement, 
+    PointElement, 
+    LinearScale, 
+    CategoryScale, 
+    BarElement,
+    Title,
+    Tooltip,
+    Legend,
+} from 'chart.js';
+Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Title, Legend, BarElement);
 
 const model = tf.sequential();
 model.add(tf.layers.conv2d({
