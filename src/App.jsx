@@ -1,6 +1,6 @@
 import "./assets/App.css";
 import { useEffect, useRef, useState } from "react";
-import { tidy, browser, getBackend, setBackend } from "@tensorflow/tfjs";
+import { tidy, browser, setBackend } from "@tensorflow/tfjs";
 import "@tensorflow/tfjs-backend-webgpu";
 import {
   Chart,
@@ -17,11 +17,14 @@ import {
 import { createModel } from "./utils/model.js";
 import { train, stopTraining } from "./utils/train.js";
 import { MnistData } from "./utils/data.js";
+import { inference } from "./utils/inference.js";
 import {
   doPrediction,
   calculateConfusionMatrix,
   getConfusionMatrixStats,
 } from "./utils/evaluate.js";
+
+// TODO: fix yellowbox warnings in console
 
 // Register Chart.js components
 Chart.register(
@@ -109,6 +112,14 @@ function App() {
     "Eight",
     "Nine",
   ];
+
+  // Drawing and Prediction state
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [predictedDigit, setPredictedDigit] = useState(null);
+  const [confidence, setConfidence] = useState(0);
+  const [allProbabilities, setAllProbabilities] = useState(Array(10).fill(0));
+  // Auto prediction timer
+  const predictionTimerRef = useRef(null);
 
   // Initialize all charts
   useEffect(() => {
@@ -466,6 +477,16 @@ function App() {
     };
   }, []);
 
+  // Initialize drawing canvas white background
+  useEffect(() => {
+    const canvas = drawingCanvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }, []);
+
   async function displayRandomSamples(data) {
     // Get the examples
     const examples = data.nextTestBatch(20);
@@ -732,6 +753,160 @@ function App() {
     }
   };
   const statusBadge = getStatusBadge();
+
+  // Drawing functions
+  const startDrawing = (event) => {
+    setIsDrawing(true);
+    const canvas = drawingCanvasRef.current;
+    const ctx = canvas.getContext("2d");
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 20;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+  };
+
+  const drawOnCanvas = (event) => {
+    if (!isDrawing) return;
+
+    const canvas = drawingCanvasRef.current;
+    const ctx = canvas.getContext("2d");
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    ctx.lineTo(x, y);
+    ctx.stroke();
+
+    // Schedule auto prediction
+    scheduleAutoPrediction();
+  };
+
+  const stopDrawing = () => {
+    if (!isDrawing) return;
+
+    setIsDrawing(false);
+    const canvas = drawingCanvasRef.current;
+    const ctx = canvas.getContext("2d");
+    ctx.closePath();
+
+    // Schedule auto prediction when user stops drawing
+    scheduleAutoPrediction();
+  };
+
+  // Touch events for mobile
+  const startDrawingTouch = (event) => {
+    event.preventDefault();
+    setIsDrawing(true);
+    const canvas = drawingCanvasRef.current;
+    const ctx = canvas.getContext("2d");
+    const rect = canvas.getBoundingClientRect();
+    const touch = event.touches[0];
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 20;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+  };
+
+  const drawOnCanvasTouch = (event) => {
+    event.preventDefault();
+    if (!isDrawing) return;
+
+    const canvas = drawingCanvasRef.current;
+    const ctx = canvas.getContext("2d");
+    const rect = canvas.getBoundingClientRect();
+    const touch = event.touches[0];
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+
+    ctx.lineTo(x, y);
+    ctx.stroke();
+
+    // Schedule auto prediction
+    scheduleAutoPrediction();
+  };
+
+  const stopDrawingTouch = (event) => {
+    event.preventDefault();
+    if (!isDrawing) return;
+
+    setIsDrawing(false);
+    const canvas = drawingCanvasRef.current;
+    const ctx = canvas.getContext("2d");
+    ctx.closePath();
+
+    // Schedule auto prediction
+    scheduleAutoPrediction();
+  };
+
+  async function predictDrawing() {
+    const canvas = drawingCanvasRef.current;
+    if (!canvas) return;
+
+    try {
+      // Use the inference utility function
+      const { predictions, predictedDigit } = inference(
+        modelRef.current,
+        canvas
+      );
+
+      // Get all probabilities
+      const probabilities = await predictions.data();
+      const confidenceValue = probabilities[predictedDigit];
+
+      setPredictedDigit(predictedDigit);
+      setConfidence(confidenceValue);
+      setAllProbabilities(Array.from(probabilities));
+
+      // Clean up
+      predictions.dispose();
+    } catch (error) {
+      console.error("Prediction error:", error);
+    }
+  }
+
+  function clearCanvas() {
+    const canvas = drawingCanvasRef.current;
+    if (!canvas) return;
+
+    // Clear any pending prediction
+    if (predictionTimerRef.current) {
+      clearTimeout(predictionTimerRef.current);
+    }
+
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Reset prediction results
+    setPredictedDigit(null);
+    setConfidence(0);
+    setAllProbabilities(Array(10).fill(0));
+  }
+  // Auto predict after 0.5 seconds of no drawing
+  const scheduleAutoPrediction = () => {
+    // Clear existing timer
+    if (predictionTimerRef.current) {
+      clearTimeout(predictionTimerRef.current);
+    }
+
+    // Set new timer
+    predictionTimerRef.current = setTimeout(() => {
+      if (modelRef.current) {
+        predictDrawing();
+      }
+    }, 500);
+  };
 
   return (
     <div className="container-fluid p-4">
@@ -1015,6 +1190,18 @@ function App() {
               <h5 className="card-title fw-bold mb-3 pb-2 border-bottom border-secondary">
                 <i className="bi bi-brush me-2"></i>
                 Draw Digit
+                {isTraining && (
+                  <span className="badge bg-warning ms-2 small">
+                    <i className="bi bi-lock-fill me-1"></i>
+                    Locked
+                  </span>
+                )}
+                {!isTraining && !modelRef.current && (
+                  <span className="badge bg-secondary ms-2 small">
+                    <i className="bi bi-exclamation-circle me-1"></i>
+                    Train Model First
+                  </span>
+                )}
               </h5>
               <div className="drawing-canvas-wrapper-compact mb-3">
                 <canvas
@@ -1022,12 +1209,53 @@ function App() {
                   width={280}
                   height={280}
                   className="drawing-canvas"
+                  style={{
+                    touchAction: "none",
+                    opacity: isTraining || !modelRef.current ? 0.5 : 1,
+                    cursor:
+                      isTraining || !modelRef.current
+                        ? "not-allowed"
+                        : "crosshair",
+                    pointerEvents:
+                      isTraining || !modelRef.current ? "none" : "auto",
+                  }}
+                  onMouseDown={startDrawing}
+                  onMouseMove={drawOnCanvas}
+                  onMouseUp={stopDrawing}
+                  onMouseLeave={stopDrawing}
+                  onTouchStart={startDrawingTouch}
+                  onTouchMove={drawOnCanvasTouch}
+                  onTouchEnd={stopDrawingTouch}
                 ></canvas>
               </div>
-              <button className="btn btn-secondary w-100 btn-sm">
-                <i className="bi bi-eraser me-1"></i>
-                Clear Canvas
-              </button>
+              <div className="d-grid gap-2">
+                <button
+                  className="btn btn-secondary btn-sm"
+                  onClick={clearCanvas}
+                  disabled={isTraining || !modelRef.current}
+                >
+                  <i className="bi bi-eraser me-1"></i>
+                  Clear Canvas
+                </button>
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={predictDrawing}
+                  disabled={isTraining || !modelRef.current}
+                >
+                  <i className="bi bi-cpu me-1"></i>
+                  Predict
+                </button>
+              </div>
+              {(isTraining || !modelRef.current) && (
+                <div className="text-center mt-2">
+                  <small className="text-muted">
+                    <i className="bi bi-info-circle me-1"></i>
+                    {isTraining
+                      ? "Drawing is disabled during training"
+                      : "Please train a model first to enable drawing"}
+                  </small>
+                </div>
+              )}
             </div>
           </div>
 
@@ -1042,7 +1270,9 @@ function App() {
               <div className="prediction-result-card-compact mb-3">
                 <div className="predicted-digit-compact">
                   <div className="digit-label-compact">Predicted Digit</div>
-                  <div className="digit-value-compact">-</div>
+                  <div className="digit-value-compact">
+                    {predictedDigit !== null ? predictedDigit : "-"}
+                  </div>
                 </div>
                 <div className="confidence-meter-compact mt-3">
                   <div className="confidence-label-compact mb-2 small">
@@ -1052,9 +1282,11 @@ function App() {
                     <div
                       className="progress-bar bg-success"
                       role="progressbar"
-                      style={{ width: "0%" }}
+                      style={{ width: `${confidence * 100}%` }}
                     >
-                      <small className="fw-semibold">0%</small>
+                      <small className="fw-semibold">
+                        {(confidence * 100).toFixed(1)}%
+                      </small>
                     </div>
                   </div>
                 </div>
@@ -1065,16 +1297,18 @@ function App() {
                 All Probabilities
               </h6>
               <div className="predictions-list-compact">
-                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((digit) => (
+                {allProbabilities.map((prob, digit) => (
                   <div key={digit} className="prediction-item-compact">
                     <div className="prediction-digit-compact">{digit}</div>
                     <div className="prediction-bar-wrapper-compact">
                       <div
                         className="prediction-bar"
-                        style={{ width: "0%" }}
+                        style={{ width: `${prob * 100}%` }}
                       ></div>
                     </div>
-                    <div className="prediction-probability-compact">0%</div>
+                    <div className="prediction-probability-compact">
+                      {(prob * 100).toFixed(1)}%
+                    </div>
                   </div>
                 ))}
               </div>
