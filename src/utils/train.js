@@ -83,21 +83,25 @@ export async function train(
         setOptions.setBatchAccuracy(logs.acc);
         setOptions.setBatchCount(batch + 1);
 
-        chartOptions.batchLossChartInstance.current.data.labels.push(
-          batchCounter
-        );
-        chartOptions.batchLossChartInstance.current.data.datasets[0].data.push(
-          logs.loss
-        );
-        chartOptions.batchLossChartInstance.current.update();
+        if (chartOptions.batchLossChartInstance.current) {
+          chartOptions.batchLossChartInstance.current.data.labels.push(
+            batchCounter
+          );
+          chartOptions.batchLossChartInstance.current.data.datasets[0].data.push(
+            logs.loss
+          );
+          chartOptions.batchLossChartInstance.current.update();
+        }
 
-        chartOptions.batchAccuracyChartInstance.current.data.labels.push(
-          batchCounter
-        );
-        chartOptions.batchAccuracyChartInstance.current.data.datasets[0].data.push(
-          logs.acc
-        );
-        chartOptions.batchAccuracyChartInstance.current.update();
+        if (chartOptions.batchAccuracyChartInstance.current) {
+          chartOptions.batchAccuracyChartInstance.current.data.labels.push(
+            batchCounter
+          );
+          chartOptions.batchAccuracyChartInstance.current.data.datasets[0].data.push(
+            logs.acc
+          );
+          chartOptions.batchAccuracyChartInstance.current.update();
+        }
       },
 
       onEpochBegin: () => {
@@ -125,25 +129,31 @@ export async function train(
         setOptions.setValidLoss(logs.val_loss);
         setOptions.setValidAccuracy(logs.val_acc);
 
-        chartOptions.epochLossChartInstance.current.data.labels.push(epoch + 1);
-        chartOptions.epochLossChartInstance.current.data.datasets[0].data.push(
-          logs.loss
-        );
-        chartOptions.epochLossChartInstance.current.data.datasets[1].data.push(
-          logs.val_loss
-        );
-        chartOptions.epochLossChartInstance.current.update();
+        if (chartOptions.epochLossChartInstance.current) {
+          chartOptions.epochLossChartInstance.current.data.labels.push(
+            epoch + 1
+          );
+          chartOptions.epochLossChartInstance.current.data.datasets[0].data.push(
+            logs.loss
+          );
+          chartOptions.epochLossChartInstance.current.data.datasets[1].data.push(
+            logs.val_loss
+          );
+          chartOptions.epochLossChartInstance.current.update();
+        }
 
-        chartOptions.epochAccuracyChartInstance.current.data.labels.push(
-          epoch + 1
-        );
-        chartOptions.epochAccuracyChartInstance.current.data.datasets[0].data.push(
-          logs.acc
-        );
-        chartOptions.epochAccuracyChartInstance.current.data.datasets[1].data.push(
-          logs.val_acc
-        );
-        chartOptions.epochAccuracyChartInstance.current.update();
+        if (chartOptions.epochAccuracyChartInstance.current) {
+          chartOptions.epochAccuracyChartInstance.current.data.labels.push(
+            epoch + 1
+          );
+          chartOptions.epochAccuracyChartInstance.current.data.datasets[0].data.push(
+            logs.acc
+          );
+          chartOptions.epochAccuracyChartInstance.current.data.datasets[1].data.push(
+            logs.val_acc
+          );
+          chartOptions.epochAccuracyChartInstance.current.update();
+        }
       },
     },
   });

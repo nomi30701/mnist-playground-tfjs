@@ -252,13 +252,6 @@ npm run preview
 3. **Monitor Overfitting**: Watch for diverging training and validation accuracy
 4. **Experiment**: Try different learning rates and epochs to find optimal settings
 
-### For Better Predictions
-
-1. **Draw Clearly**: Make digits large and centered
-2. **Use Bold Strokes**: Thicker lines work better
-3. **Single Digit**: Draw one digit at a time
-4. **Center Position**: Keep the digit in the middle of the canvas
-
 ## 🔧 Customization
 
 ### Using Custom Models
