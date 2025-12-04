@@ -368,14 +368,19 @@ export const useMnistModel = ({
       });
 
       if (canvasRefs.current[i]) {
-        await browser.toPixels(imageTensor, canvasRefs.current[i]);
+        await browser.draw(imageTensor, canvasRefs.current[i]);
       }
+      imageTensor.dispose();
 
       const labelTensor = examples.labels.slice(
         [i, 0],
         [1, examples.labels.shape[1]]
       );
-      const label = labelTensor.argMax(-1).dataSync()[0];
+      const argMax = labelTensor.argMax(-1);
+      const labelData = await argMax.data();
+      const label = labelData[0];
+      argMax.dispose();
+      
       samples.push({ label });
       labelTensor.dispose();
     }
