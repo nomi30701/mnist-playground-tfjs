@@ -1,59 +1,51 @@
 import React, { memo } from "react";
 import MetricCard from "./MetricCard";
 
-const TrainingMetricsSummary = memo(({ metrics, trainingStatus, config }) => {
-  const getStatusBadge = () => {
-    switch (trainingStatus) {
-      case "Ready":
-        return { class: "bg-secondary", text: "Ready", icon: "bi-circle-fill" };
-      case "Loading Data":
-        return {
-          class: "bg-info",
-          text: "Loading Data",
-          icon: "bi-hourglass-split",
-        };
-      case "Loading Model":
-        return {
-          class: "bg-info",
-          text: "Loading Model",
-          icon: "bi-hourglass-split",
-        };
-      case "Training":
-        return {
-          class: "bg-warning",
-          text: "Training",
-          icon: "bi-lightning-charge-fill",
-        };
-      case "Evaluating":
-        return {
-          class: "bg-info",
-          text: "Evaluating",
-          icon: "bi-clipboard-data",
-        };
-      case "Completed":
-        return {
-          class: "bg-success",
-          text: "Completed",
-          icon: "bi-check-circle-fill",
-        };
-      case "Stopped":
-        return {
-          class: "bg-danger",
-          text: "Stopped",
-          icon: "bi-x-circle-fill",
-        };
-      case "Error":
-        return {
-          class: "bg-danger",
-          text: "Error",
-          icon: "bi-exclamation-triangle-fill",
-        };
-      default:
-        return { class: "bg-secondary", text: "Ready", icon: "bi-circle-fill" };
-    }
-  };
+// 1. 將狀態樣式提取到組件外部的配置物件中，減少組件內部的雜訊
+const STATUS_CONFIG = {
+  Ready: { class: "bg-secondary", text: "Ready", icon: "bi-circle-fill" },
+  "Loading Data": {
+    class: "bg-info",
+    text: "Loading Data",
+    icon: "bi-hourglass-split",
+  },
+  "Loading Model": {
+    class: "bg-info",
+    text: "Loading Model",
+    icon: "bi-hourglass-split",
+  },
+  Training: {
+    class: "bg-warning",
+    text: "Training",
+    icon: "bi-lightning-charge-fill",
+  },
+  Evaluating: {
+    class: "bg-info",
+    text: "Evaluating",
+    icon: "bi-clipboard-data",
+  },
+  Completed: {
+    class: "bg-success",
+    text: "Completed",
+    icon: "bi-check-circle-fill",
+  },
+  Stopped: { class: "bg-danger", text: "Stopped", icon: "bi-x-circle-fill" },
+  Error: {
+    class: "bg-danger",
+    text: "Error",
+    icon: "bi-exclamation-triangle-fill",
+  },
+};
 
-  const statusBadge = getStatusBadge();
+const TrainingMetricsSummary = memo(({ metrics, trainingStatus, config }) => {
+  const statusBadge = STATUS_CONFIG[trainingStatus] || STATUS_CONFIG["Ready"];
+
+  const SectionHeader = ({ icon, title }) => (
+    <h6 className="text-muted mb-3 small">
+      <i className={`bi ${icon} me-2`}></i>
+      {title}
+    </h6>
+  );
 
   return (
     <div className="card bg-dark text-light mb-4 shadow">
@@ -64,10 +56,7 @@ const TrainingMetricsSummary = memo(({ metrics, trainingStatus, config }) => {
         </h5>
 
         {/* Time Metrics */}
-        <h6 className="text-muted mb-3 small">
-          <i className="bi bi-clock me-2"></i>
-          Performance
-        </h6>
+        <SectionHeader icon="bi-clock" title="Performance" />
         <div className="row g-2 mb-4">
           <div className="col-6">
             <MetricCard
@@ -90,10 +79,7 @@ const TrainingMetricsSummary = memo(({ metrics, trainingStatus, config }) => {
         </div>
 
         {/* Batch Metrics */}
-        <h6 className="text-muted mb-3 small">
-          <i className="bi bi-arrow-clockwise me-2"></i>
-          Batch Progress
-        </h6>
+        <SectionHeader icon="bi-arrow-clockwise" title="Batch Progress" />
         <div className="row g-2 mb-4">
           <div className="col-4">
             <MetricCard
@@ -121,10 +107,7 @@ const TrainingMetricsSummary = memo(({ metrics, trainingStatus, config }) => {
         </div>
 
         {/* Epoch Metrics */}
-        <h6 className="text-muted mb-3 small">
-          <i className="bi bi-collection me-2"></i>
-          Epoch Summary
-        </h6>
+        <SectionHeader icon="bi-collection" title="Epoch Summary" />
         <div className="row g-2 mb-3">
           <div className="col-6">
             <MetricCard
